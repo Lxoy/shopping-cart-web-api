@@ -1,3 +1,5 @@
 <Solution>
   <Project Path="ShoppingCart.API/ShoppingCart.API.csproj" />
+  <Project Path="ShoppingCart.Data/ShoppingCart.Data.csproj" />
+  <Project Path="ShoppingCart.Services/ShoppingCart.Services.csproj" Id="37aa9b39-0331-4c10-b1ce-6289ae52af95" />
 </Solution>
