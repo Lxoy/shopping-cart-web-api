@@ -8,6 +8,7 @@ namespace ShoppingCart.Services
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<ArticleService>();
+            services.AddScoped<CartService>();
 
             return services;
         }
