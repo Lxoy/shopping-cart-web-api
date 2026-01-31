@@ -10,5 +10,6 @@ namespace ShoppingCart.Services.Interfaces
         ArticleDto GetById(int id);
         IEnumerable<ArticleDto> GetAll();
         ArticleDto Create(string name, decimal price, int createdByUserId);
+        void Delete(int id, int deletedByUserId);
     }
 }

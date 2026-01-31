@@ -11,6 +11,8 @@ namespace ShoppingCart.Data.Models
         public int CreatedByUserId { get; set; }
         public int ModifiedByUserId { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
 }

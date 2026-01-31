@@ -1,4 +1,5 @@
-﻿using ShoppingCart.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ShoppingCart.Data;
 using ShoppingCart.Data.Models;
 using ShoppingCart.Services.Dtos;
 using ShoppingCart.Services.Interfaces;
@@ -37,18 +38,40 @@ namespace ShoppingCart.Services.Services
                 );
         }
 
+        public void Delete(int id, int deletedByUserId)
+        {
+            var article = _dbContext.Articles.FirstOrDefault(a => a.Id == id);
+
+            if (article == null)
+            {
+                throw new KeyNotFoundException($"Article with id {id} not found.");
+            }
+
+            article.IsDeleted = true;
+            article.ModifiedByUserId = deletedByUserId;
+
+            _dbContext.SaveChanges();
+        }
+
         public IEnumerable<ArticleDto> GetAll()
         {
-            return _dbContext.Articles.Select(a => new ArticleDto(
-                a.Id,
-                a.Name,
-                a.Price
-                )).ToList();
+            return _dbContext.Articles
+                .AsNoTracking()
+                .Where(a => !a.IsDeleted)
+                .Select(a => new ArticleDto(
+                    a.Id,
+                    a.Name,
+                    a.Price
+                ))
+                .ToList();
         }
 
         public ArticleDto GetById(int id)
         {
-            var article = _dbContext.Articles.Find(id) ?? throw new KeyNotFoundException($"Article with id {id} not found.");
+            var article = _dbContext.Articles
+                .AsNoTracking()
+                .FirstOrDefault(a => a.Id == id && !a.IsDeleted) 
+                ?? throw new KeyNotFoundException($"Article with id {id} not found.");
 
             return new ArticleDto(
                 article.Id,

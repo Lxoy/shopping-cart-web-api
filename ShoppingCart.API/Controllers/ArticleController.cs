@@ -73,5 +73,13 @@ namespace ShoppingCart.API.Controllers
             ));
             return Ok(response);
         }
+
+        [HttpDelete("{id:int}")]
+        public IActionResult Delete(int id)
+        {
+            int currentUserdId = 1; // TODO: get from auth context
+            _articleService.Delete(id, currentUserdId);
+            return NoContent();
+        }
     }
 }
