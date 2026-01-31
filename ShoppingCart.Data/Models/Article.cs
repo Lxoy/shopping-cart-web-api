@@ -8,6 +8,8 @@ namespace ShoppingCart.Data.Models
     {
         public string Name { get; set; } = null!;
         public decimal Price { get; set; }
+        public int CreatedByUserId { get; set; }
+        public int ModifiedByUserId { get; set; }
 
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }

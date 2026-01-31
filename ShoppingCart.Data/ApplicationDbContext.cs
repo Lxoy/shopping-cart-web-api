@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ShoppingCart.Data.Configurations
+namespace ShoppingCart.Data
 {
     public class ApplicationDbContext : DbContext
     {

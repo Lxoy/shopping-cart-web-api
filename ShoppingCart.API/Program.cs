@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using ShoppingCart.Data.Configurations;
+using ShoppingCart.Data;
+using ShoppingCart.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddServices();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -15,9 +19,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     )
 );
 
-Console.WriteLine(
-    builder.Configuration.GetConnectionString("DefaultConnection")
-);
 
 var app = builder.Build();
 
@@ -26,6 +27,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UsePathBase("/api");
 
 app.UseHttpsRedirection();
 

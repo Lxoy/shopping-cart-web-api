@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ShoppingCart.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ShoppingCart.Data.Configurations
 {

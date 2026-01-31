@@ -20,7 +20,14 @@ namespace ShoppingCart.Data.Configurations
                 .HasMaxLength(50);
 
             builder.Property(a => a.Price)
+                .IsRequired()
                 .HasColumnType("decimal(10,2)");
+
+            builder.Property(a => a.CreatedByUserId)
+                .IsRequired();
+
+            builder.Property(a => a.ModifiedByUserId)
+                .IsRequired();
         }
     }
 }
