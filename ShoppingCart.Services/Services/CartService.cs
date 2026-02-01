@@ -63,10 +63,37 @@ namespace ShoppingCart.Services.Services
 
         }
 
+        public void RemoveItem(int userId, int articleId)
+        {
+            var cart = GetOrCreateCart(userId);
+
+            var item = cart.CartItems.FirstOrDefault(ci => ci.ArticleId == articleId) ?? throw new KeyNotFoundException($"Item with id {articleId} not found");
+
+            if(item.Quantity > 1)
+            {
+                item.Quantity -= 1;
+            }
+
+            else
+            {
+                _dbContext.CartItems.Remove(item);
+            }
+
+            _dbContext.SaveChanges();
+        }
+
+        public void RemoveAllItems(int userId)
+        {
+            var cart = GetOrCreateCart(userId);
+            _dbContext.CartItems.RemoveRange(cart.CartItems);
+            _dbContext.SaveChanges();
+        }
+
         private Cart GetOrCreateCart(int userId)
         {
             var cart = _dbContext.Carts
                 .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Article)
                 .FirstOrDefault(c => c.UserId == userId);
 
             if (cart == null)

@@ -79,7 +79,7 @@ namespace ShoppingCart.Services.Services
 
         public ArticleDto Update(int id, string? name, decimal? price, int modifiedByUserId)
         {
-            if(name is null && price is null )
+            if (name is null && price is null )
             {
                 throw new ArgumentException("At least one field (name or price) must be provided for update.");
             }
