@@ -37,7 +37,7 @@ namespace ShoppingCart.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] CreateArticleRequestDTO request)
+        public IActionResult Create([FromBody] CreateArticleRequestDto request)
         {
             int currentUserdId = 1; // TODO: get from auth context
 
@@ -80,6 +80,27 @@ namespace ShoppingCart.API.Controllers
             int currentUserdId = 1; // TODO: get from auth context
             _articleService.Delete(id, currentUserdId);
             return NoContent();
+        }
+
+        [HttpPatch("{id:int}")]
+        public IActionResult Update(int id, [FromBody] UpdateArticleRequestDto request)
+        {
+            var currentUserdId = 1; // TODO: get from auth context
+            var article = _articleService.Update(
+                id,
+                request.Name,
+                request.Price,
+                currentUserdId
+            );
+
+            var response = new ArticleResponseDto
+            (
+                article.Id,
+                article.Name,
+                article.Price
+            );
+
+            return Ok(response);
         }
     }
 }

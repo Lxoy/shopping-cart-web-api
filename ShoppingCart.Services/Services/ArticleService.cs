@@ -3,9 +3,6 @@ using ShoppingCart.Data;
 using ShoppingCart.Data.Models;
 using ShoppingCart.Services.Dtos;
 using ShoppingCart.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ShoppingCart.Services.Services
 {
@@ -78,6 +75,32 @@ namespace ShoppingCart.Services.Services
                 article.Name,
                 article.Price
                 );
+        }
+
+        public ArticleDto Update(int id, string? name, decimal? price, int modifiedByUserId)
+        {
+            if(name is null && price is null )
+            {
+                throw new ArgumentException("At least one field (name or price) must be provided for update.");
+            }
+
+            var article = _dbContext.Articles.FirstOrDefault(a => a.Id == id && !a.IsDeleted) ?? throw new KeyNotFoundException($"Article with id {id} not found."); ;
+
+            if(name is not null)
+            {
+                article.Name = name;
+            }
+
+            if (price is not null)
+            {
+                article.Price = price.Value;
+            }
+
+            article.ModifiedByUserId = modifiedByUserId;
+
+            _dbContext.SaveChanges();
+
+            return new ArticleDto(article.Id, article.Name, article.Price);
         }
     }
 }
