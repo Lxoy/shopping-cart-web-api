@@ -4,6 +4,7 @@ using ShoppingCart.API.Middleware;
 using ShoppingCart.Data;
 using ShoppingCart.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +16,9 @@ builder.Services.AddSwaggerGen();
 
 // Register application services
 builder.Services.AddServices();
+
+// Register global exception handler
+builder.Services.AddScoped<GlobalExceptionHandler>();
 
 
 // Configure Entity Framework with PostgreSQL
@@ -28,7 +32,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 var app = builder.Build();
 
 // Middleware to handle exceptions globally
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var handler = context.RequestServices
+            .GetRequiredService<GlobalExceptionHandler>();
+
+        await handler.HandleAsync(context);
+    });
+});
 
 // Set a global path base for the API
 app.UsePathBase("/api");
