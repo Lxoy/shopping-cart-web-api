@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using ShoppingCart.API.Middleware;
+using ShoppingCart.API.Handlers;
 using ShoppingCart.Data;
 using ShoppingCart.Services;
 

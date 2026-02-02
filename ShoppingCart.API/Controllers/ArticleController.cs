@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using ShoppingCart.API.Dtos.Articles;
+﻿using Microsoft.AspNetCore.Mvc;
+using ShoppingCart.API.ViewModels.Requests;
+using ShoppingCart.API.ViewModels.Responses;
 using ShoppingCart.Services.Services;
 
 namespace ShoppingCart.API.Controllers
@@ -26,7 +26,7 @@ namespace ShoppingCart.API.Controllers
                 return NotFound();
             }
 
-            var response = new ArticleResponseDto
+            var response = new ArticleResponse
             (
                 articleDto.Id,
                 articleDto.Name,
@@ -37,7 +37,7 @@ namespace ShoppingCart.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] CreateArticleRequestDto request)
+        public IActionResult Create([FromBody] CreateArticleRequest request)
         {
             int currentUserdId = 1; // TODO: get from auth context
 
@@ -47,7 +47,7 @@ namespace ShoppingCart.API.Controllers
                 currentUserdId
             );
 
-            var response = new ArticleResponseDto
+            var response = new ArticleResponse
             (
                 articleDto.Id,
                 articleDto.Name,
@@ -65,7 +65,7 @@ namespace ShoppingCart.API.Controllers
         public IActionResult GetAll()
         {
             var articleDtos = _articleService.GetAll();
-            var response = articleDtos.Select(articleDto => new ArticleResponseDto
+            var response = articleDtos.Select(articleDto => new ArticleResponse
             (
                 articleDto.Id,
                 articleDto.Name,
@@ -83,7 +83,7 @@ namespace ShoppingCart.API.Controllers
         }
 
         [HttpPatch("{id:int}")]
-        public IActionResult Update(int id, [FromBody] UpdateArticleRequestDto request)
+        public IActionResult Update(int id, [FromBody] UpdateArticleRequest request)
         {
             var currentUserdId = 1; // TODO: get from auth context
             var article = _articleService.Update(
@@ -93,7 +93,7 @@ namespace ShoppingCart.API.Controllers
                 currentUserdId
             );
 
-            var response = new ArticleResponseDto
+            var response = new ArticleResponse
             (
                 article.Id,
                 article.Name,

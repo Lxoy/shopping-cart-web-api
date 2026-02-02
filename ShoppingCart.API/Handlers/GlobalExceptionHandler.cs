@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 
-namespace ShoppingCart.API.Middleware
+namespace ShoppingCart.API.Handlers
 {
     public class GlobalExceptionHandler
     {
@@ -21,7 +21,6 @@ namespace ShoppingCart.API.Middleware
             {
                 KeyNotFoundException => StatusCodes.Status404NotFound,
                 ArgumentException => StatusCodes.Status400BadRequest,
-                InvalidOperationException => StatusCodes.Status409Conflict,
                 _ => StatusCodes.Status500InternalServerError
             };
 

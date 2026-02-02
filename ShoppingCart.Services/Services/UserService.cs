@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShoppingCart.Data;
 using ShoppingCart.Services.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ShoppingCart.Services.Services
 {
@@ -15,7 +12,7 @@ namespace ShoppingCart.Services.Services
             _dbContext = dbContext;
         }
 
-        public UserDTO GetUser(int id)
+        public UserDto GetUser(int id)
         {
             var user = _dbContext.Users.AsNoTracking().SingleOrDefault(u => u.Id == id);
 
@@ -24,7 +21,7 @@ namespace ShoppingCart.Services.Services
                 throw new Exception($"User with id {id} not found");
             }
 
-            return new UserDTO { Id = user.Id, Username = user.Username };
+            return new UserDto (user.Id, user.Username );
         }
     }
 }

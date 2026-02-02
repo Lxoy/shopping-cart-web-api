@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ShoppingCart.Data.Models
+﻿namespace ShoppingCart.Data.Models
 {
     public class Cart : BaseEntity
     {

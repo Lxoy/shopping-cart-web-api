@@ -20,13 +20,11 @@ namespace ShoppingCart.Data.Configurations
 
             builder.HasOne(ci => ci.Cart)
                 .WithMany(c => c.CartItems)
-                .HasForeignKey(ci => ci.CartId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(ci => ci.CartId);
 
             builder.HasOne(ci => ci.Article)
                 .WithMany(a => a.CartItems)
-                .HasForeignKey(ci => ci.ArticleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(ci => ci.ArticleId);
         }
     }
 }

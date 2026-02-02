@@ -22,7 +22,9 @@ namespace ShoppingCart.Services.Services
                 Name = name,
                 Price = price,
                 CreatedByUserId = createdByUserId,
-                ModifiedByUserId = createdByUserId
+                ModifiedByUserId = createdByUserId,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow
             };
 
             _dbContext.Articles.Add(article);
@@ -45,6 +47,7 @@ namespace ShoppingCart.Services.Services
             }
 
             article.IsDeleted = true;
+            article.ModifiedAt = DateTime.UtcNow;
             article.ModifiedByUserId = deletedByUserId;
 
             _dbContext.SaveChanges();
@@ -96,6 +99,7 @@ namespace ShoppingCart.Services.Services
                 article.Price = price.Value;
             }
 
+            article.ModifiedAt = DateTime.UtcNow;
             article.ModifiedByUserId = modifiedByUserId;
 
             _dbContext.SaveChanges();

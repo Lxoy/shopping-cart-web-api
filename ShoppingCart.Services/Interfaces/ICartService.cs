@@ -1,8 +1,4 @@
-﻿using ShoppingCart.Data.Models;
-using ShoppingCart.Services.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ShoppingCart.Services.Dtos;
 
 namespace ShoppingCart.Services.Interfaces
 {

@@ -14,8 +14,13 @@ namespace ShoppingCart.Data.Configurations
 
             builder.HasOne(c => c.User)
                    .WithOne(u => u.Cart)
-                   .HasForeignKey<Cart>(c => c.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey<Cart>(c => c.UserId);
+
+            builder.Property(c => c.CreatedAt)
+               .IsRequired();
+
+            builder.Property(c => c.ModifiedAt)
+                .IsRequired();
         }
     }
 }

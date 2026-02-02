@@ -28,6 +28,12 @@ namespace ShoppingCart.Data.Configurations
 
             builder.Property(a => a.ModifiedByUserId)
                 .IsRequired();
+
+            builder.Property(a => a.CreatedAt)
+                .IsRequired();
+
+            builder.Property(a => a.ModifiedAt)
+                .IsRequired();
         }
     }
 }

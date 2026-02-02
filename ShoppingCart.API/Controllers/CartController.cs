@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using ShoppingCart.API.Dtos.Cart;
-using ShoppingCart.Data.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using ShoppingCart.API.ViewModels.Requests;
+using ShoppingCart.API.ViewModels.Responses;
 using ShoppingCart.Services.Services;
 
 namespace ShoppingCart.API.Controllers
@@ -22,9 +21,9 @@ namespace ShoppingCart.API.Controllers
         {
             var cartDto = _cartService.GetByUserId(userId);
 
-            var response = new CartResponseDto(
+            var response = new CartResponse(
                 cartDto.Items.Select(i =>
-                new CartItemResponseDto(
+                new CartItemResponse(
                         i.ArticleId,
                         i.ArticleName,
                         i.ArticlePrice,
@@ -39,7 +38,7 @@ namespace ShoppingCart.API.Controllers
         }
 
         [HttpPost("{userId:int}/items")]
-        public IActionResult AddItem(int userId, [FromBody] AddCartItemRequestDto request)
+        public IActionResult AddItem(int userId, [FromBody] AddCartItemRequest request)
         {
             _cartService.AddItem(userId, request.ArticleId, request.Quantity);
             return NoContent();

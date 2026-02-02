@@ -14,15 +14,20 @@ namespace ShoppingCart.Data.Configurations
 
             builder.Property(u => u.Username)
                 .IsRequired()
-                .HasMaxLength(45);
+                .HasMaxLength(30);
 
             builder.Property(u => u.Email)
                 .IsRequired()
                 .HasMaxLength(100);
 
-
             builder.HasIndex(u => u.Email)
                 .IsUnique();
+
+            builder.Property(u => u.CreatedAt)
+                .IsRequired();
+
+            builder.Property(u => u.ModifiedAt)
+                .IsRequired();
         }
     }
 }
