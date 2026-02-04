@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShoppingCart.API.ViewModels.Requests;
 using ShoppingCart.API.ViewModels.Responses;
+using ShoppingCart.Services.Interfaces;
 using ShoppingCart.Services.Services;
 
 namespace ShoppingCart.API.Controllers
@@ -9,9 +10,9 @@ namespace ShoppingCart.API.Controllers
     [ApiController]
     public class CartController : ControllerBase
     {
-        private readonly CartService _cartService;
+        private readonly ICartService _cartService;
 
-        public CartController(CartService cartService)
+        public CartController(ICartService cartService)
         {
             _cartService = cartService;
         }

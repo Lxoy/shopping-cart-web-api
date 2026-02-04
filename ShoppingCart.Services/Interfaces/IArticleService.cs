@@ -2,7 +2,7 @@
 
 namespace ShoppingCart.Services.Interfaces
 {
-    internal interface IArticleService
+    public interface IArticleService
     {
         ArticleDto GetById(int id);
         IEnumerable<ArticleDto> GetAll();
