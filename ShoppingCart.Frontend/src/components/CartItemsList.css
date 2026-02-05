@@ -1,0 +1,39 @@
+/* cijela stranica */
+.cart-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* lista */
+.cart-list {
+  width: 100%;
+  max-width: 680px;
+  max-height: 70vh;
+
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  overflow-y: auto;
+
+  /* malo finog dizajna */
+  background-color: transparent;
+}
+
+/* ljepši scrollbar (optional) */
+.cart-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cart-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.cart-list::-webkit-scrollbar-track {
+  background: transparent;
+}

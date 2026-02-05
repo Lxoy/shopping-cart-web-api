@@ -1,6 +1,5 @@
+import { API_URL } from "./config";
 import type { Article } from "../types/Article";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export const getArticles = async (): Promise<Article[]> => {
     const res = await fetch(`${API_URL}/article`);

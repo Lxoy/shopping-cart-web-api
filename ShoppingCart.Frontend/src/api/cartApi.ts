@@ -1,6 +1,5 @@
+import { API_URL } from "./config";
 import type { Cart } from "../types/Cart";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export const getCart = async (userId: number): Promise<Cart> => {
     const res = await fetch(`${API_URL}/cart/${userId}`);
@@ -29,4 +28,12 @@ export const addToCart = async (userId: number, data: { articleId: number, quant
     });
 
      if (!res.ok) throw new Error("Failed to add item to the cart");
+}
+
+export const removeItem = async (userId: number, articleId: number): Promise<void> => {
+    const res = await fetch(`${API_URL}/cart/${userId}/items/${articleId}`, {
+        method: "DELETE"
+    });
+
+     if (!res.ok) throw new Error("Failed to delete item from the cart");
 }

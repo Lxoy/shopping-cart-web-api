@@ -3,11 +3,10 @@ import './CartItemListElement.css';
 
 type Props = {
     cartItem: CartItem;
-    onAdd: (id: number) => void;
-    onDelete: (id: number) => void;
+    onDelete: (articleId: number) => void;
 };
 
-export default function CartItem({ cartItem, onAdd, onDelete }: Props) {
+export default function CartItem({ cartItem, onDelete }: Props) {
     return (
         <div className="cart-item">
             <div className="article-info">
@@ -16,21 +15,12 @@ export default function CartItem({ cartItem, onAdd, onDelete }: Props) {
                 <span>Qty: {cartItem.quantity}</span>
             </div>
 
-            <div>
-                <button
-                    className="add-button"
-                    onClick={() => onAdd(cartItem.articleId)}
-                >
-                    +
-                </button>
-
-                <button
+            <button
                     className="delete-button"
                     onClick={() => onDelete(cartItem.articleId)}
                 >
-                    -
+                    Remove
                 </button>
-            </div>
         </div>
     );
 }

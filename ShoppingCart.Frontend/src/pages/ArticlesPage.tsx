@@ -8,6 +8,7 @@ import { addToCart } from "../api/cartApi";
 import AddMenu from "../components/AddMenu";
 
 export default function ArticlesPage() {
+  const [error, setError] = useState<string | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
@@ -18,7 +19,14 @@ export default function ArticlesPage() {
     try {
       const data = await getArticles();
       setArticles(data);
-    } finally {
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Unknown error occurred");
+      }
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -28,9 +36,17 @@ export default function ArticlesPage() {
   }, []);
 
   const handleDelete = async (id: number) => {
-    await deleteArticle(id);
-    setArticles(prev => prev.filter(a => a.id !== id));
-  };
+    try {
+      await deleteArticle(id);
+      setArticles(prev => prev.filter(a => a.id !== id));
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Unknown error occurred");
+      }
+    };
+  }
 
   const openAddMenu = (id: number) => {
     setSelectedArticleId(id);
@@ -38,18 +54,42 @@ export default function ArticlesPage() {
   };
 
   const handleConfirmAdd = async (articleId: number, quantity: number) => {
-    await addToCart(userId, {
-      articleId,
-      quantity
-    });
+    try {
+      await addToCart(userId, {
+        articleId,
+        quantity
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Unknown error occurred");
+      }
+    };
+
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="error-box">
+        <p className="message">Loading articles...</p>
+      </div>
+    );
+  }
 
+
+  if (error) {
+    return (
+      <div className="error-box">
+        <p className="message">{error}</p>
+      </div>
+    );
+  }
+  
   return (
     <div className="article-page">
       <a href="/cart" className="cart-nav">Cart</a>
-      {selectedArticleId &&
+      {selectedArticleId !== null &&
         <div className="add-menu">
           <AddMenu
             selectedArticleId={selectedArticleId}
