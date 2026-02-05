@@ -28,8 +28,21 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     )
 );
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCors", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 
 var app = builder.Build();
+
+app.UseCors("DevCors");
 
 // Middleware to handle exceptions globally
 app.UseExceptionHandler(errorApp =>
@@ -54,7 +67,7 @@ if (app.Environment.IsDevelopment())
 
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

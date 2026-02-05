@@ -1,0 +1,9 @@
+.cart-item{
+    width: 640px;
+    height: 120px;
+
+    display: flex;
+    flex-direction: row;
+
+    border: 1px solid purple;
+}
