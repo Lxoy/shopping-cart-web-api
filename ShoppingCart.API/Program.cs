@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ShoppingCart.API.Handlers;
 using ShoppingCart.Data;
 using ShoppingCart.Services;
+using System.Reflection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,14 @@ builder.Services.AddControllers();
 // For Swagger/OpenAPI documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(
+        Path.Combine(AppContext.BaseDirectory, xmlFilename)
+    );
+});
 
 // Register application services
 builder.Services.AddServices();

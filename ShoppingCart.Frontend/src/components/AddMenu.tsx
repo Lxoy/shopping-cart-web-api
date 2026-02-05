@@ -20,12 +20,14 @@ export default function AddMenu({
         <input
             type="number"
             min={1}
+            max={10}
             value={quantity}
             onChange={e => setQuantity(Number(e.target.value))}
         />
 
         <div className="actions">
             <button
+                disabled={quantity < 1 || quantity > 10}
                 onClick={async () => {
                     await onConfirm(selectedArticleId, quantity);
                     onClose();
@@ -38,5 +40,15 @@ export default function AddMenu({
                 Cancel
             </button>
         </div>
+        {quantity < 1 && (
+            <p className="warning-text">
+                Minimum quantity is 1
+            </p>
+        )}
+        {quantity > 10 && (
+            <p className="warning-text">
+                Maximum quantity is 10
+            </p>
+        )}
     </div>
 }

@@ -48,3 +48,9 @@
   background: #333;
   color: #fff;
 }
+
+.warning-text{
+  color: #4f46e5;
+  font-style: italic;
+  text-align: center;
+}

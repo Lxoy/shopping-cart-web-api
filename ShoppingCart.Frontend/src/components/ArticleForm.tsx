@@ -10,6 +10,11 @@ export default function ArticleForm({
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
 
+  const isInvalid =
+    name.trim() === "" ||
+    price === "" ||
+    Number(price) < 0.1;
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -35,11 +40,14 @@ export default function ArticleForm({
         placeholder="Price"
         type="number"
         step="0.01"
+        min={0.1}
         value={price}
         onChange={e => setPrice(e.target.value)}
       />
 
-      <button type="submit">Add</button>
+      <button
+        disabled={isInvalid}
+        type="submit">Add</button>
     </form>
   );
 }

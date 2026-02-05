@@ -12,6 +12,7 @@ namespace ShoppingCart.Services.Services
     public class CartService : ICartService
     {
         private readonly ApplicationDbContext _dbContext;
+        private const int MaxQuantity = 10;
 
         public CartService(ApplicationDbContext dbContext)
         {
@@ -20,13 +21,14 @@ namespace ShoppingCart.Services.Services
 
         public void AddItem(int userId, int articleId, int quantity)
         {
+
             if (!_dbContext.Articles.Any(a => a.Id == articleId && !a.IsDeleted))
             {
                 throw new KeyNotFoundException($"Article with id {articleId} not found.");
             }
 
-            if (quantity <= 0)
-                throw new ArgumentException("Quantity must be greater than zero.");
+            if (quantity <= 0 || quantity > MaxQuantity)
+                throw new ArgumentException($"Quantity must be between 1 and {MaxQuantity}.");
 
             var cart = GetOrCreateCart(userId);
 
@@ -42,9 +44,15 @@ namespace ShoppingCart.Services.Services
             }
             else
             {
-                item.Quantity += quantity;
+                var newQuantity = item.Quantity + quantity;
+
+                if (newQuantity > MaxQuantity)
+                    throw new ArgumentException($"Maximum quantity per item is {MaxQuantity}.");
+
+                item.Quantity = newQuantity;
             }
 
+            cart.ModifiedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
         }
 
@@ -71,21 +79,39 @@ namespace ShoppingCart.Services.Services
 
         }
 
+        public void DecreaseItemQuantity(int userId, int articleId)
+        {
+            var cart = GetOrCreateCart(userId);
+
+            var item = cart.CartItems
+                .FirstOrDefault(ci => ci.ArticleId == articleId)
+                ?? throw new KeyNotFoundException($"Item with id {articleId} not found.");
+
+            if (item.Quantity <= 1)
+                throw new InvalidOperationException("Quantity cannot be less than 1.");
+
+            item.Quantity -= 1;
+
+            if (item.Quantity <= 0)
+            {
+                _dbContext.CartItems.Remove(item);
+            }
+
+            cart.ModifiedAt = DateTime.UtcNow;
+
+            _dbContext.SaveChanges();
+        }
+
         public void RemoveItem(int userId, int articleId)
         {
             var cart = GetOrCreateCart(userId);
 
-            var item = cart.CartItems.FirstOrDefault(ci => ci.ArticleId == articleId) ?? throw new KeyNotFoundException($"Item with id {articleId} not found");
+            var item = cart.CartItems
+                .FirstOrDefault(ci => ci.ArticleId == articleId)
+                ?? throw new KeyNotFoundException($"Item with id {articleId} not found.");
 
-            if(item.Quantity > 1)
-            {
-                item.Quantity -= 1;
-            }
-
-            else
-            {
-                _dbContext.CartItems.Remove(item);
-            }
+            _dbContext.CartItems.Remove(item);
+            cart.ModifiedAt = DateTime.UtcNow;
 
             _dbContext.SaveChanges();
         }
@@ -94,6 +120,7 @@ namespace ShoppingCart.Services.Services
         {
             var cart = GetOrCreateCart(userId);
             _dbContext.CartItems.RemoveRange(cart.CartItems);
+            cart.ModifiedAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
         }
 

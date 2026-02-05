@@ -17,6 +17,16 @@ namespace ShoppingCart.Services.Services
 
         public ArticleDto Create(string name, decimal price, int createdByUserId)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Article name is required.");
+            }
+
+            if (price < 0.1m)
+            {
+                throw new ArgumentException("Price must be at least 0.1.");
+            }
+
             var article = new Article
             {
                 Name = name,
@@ -87,7 +97,17 @@ namespace ShoppingCart.Services.Services
                 throw new ArgumentException("At least one field (name or price) must be provided for update.");
             }
 
-            var article = _dbContext.Articles.FirstOrDefault(a => a.Id == id && !a.IsDeleted) ?? throw new KeyNotFoundException($"Article with id {id} not found."); ;
+            if (name is not null && string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Article name cannot be empty.");
+            }
+
+            if (price is not null && price < 0.1m)
+            {
+                throw new ArgumentException("Price must be at least 0.1.");
+            }
+
+            var article = _dbContext.Articles.FirstOrDefault(a => a.Id == id && !a.IsDeleted) ?? throw new KeyNotFoundException($"Article with id {id} not found.");
 
             if(name is not null)
             {
