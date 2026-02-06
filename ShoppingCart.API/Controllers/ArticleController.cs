@@ -6,14 +6,14 @@ using ShoppingCart.Services.Services;
 
 namespace ShoppingCart.API.Controllers
 {
+
     /// <summary>
-    /// Provides HTTP endpoints for managing articles, including operations to create, retrieve, update, and delete
-    /// articles.
+    /// Handles HTTP requests for managing articles, including retrieving, creating, updating, and deleting article
+    /// resources.
     /// </summary>
-    /// <remarks>This controller defines RESTful API actions for article resources. All endpoints require
-    /// appropriate authentication and are routed under the "/article" path. The controller relies on an injected
-    /// article service to perform business operations. Responses follow standard HTTP status codes for success and
-    /// error conditions.</remarks>
+    /// <remarks>This controller provides RESTful endpoints for article operations. All routes are prefixed
+    /// with "/article". Methods require a valid article identifier where applicable. Authentication and authorization
+    /// are assumed but not shown in this implementation.</remarks>
     [Route("/article")]
     [ApiController]
     public class ArticleController : ControllerBase
@@ -25,16 +25,15 @@ namespace ShoppingCart.API.Controllers
             _articleService = articleService;
         }
 
-        
         /// <summary>
         /// Retrieves the article with the specified identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the article to retrieve. Must be a positive integer.</param>
-        /// <returns>An <see cref="IActionResult"/> containing the article data if found; otherwise, a 404 Not Found response.</returns>
+        /// <param name="id">The unique identifier of the article to retrieve.</param>
+        /// <returns>An <see cref="IActionResult"/> containing the article data if found; otherwise, a NotFound result.</returns>
         [HttpGet("{id:int}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var articleDto = _articleService.GetById(id);
+            var articleDto = await _articleService.GetById(id);
 
             if (articleDto is null)
             {
@@ -52,18 +51,17 @@ namespace ShoppingCart.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new article using the data provided in the request body.
+        /// Creates a new article using the specified request data.
         /// </summary>
-        /// <remarks>The created article is associated with the currently authenticated user. The response
-        /// includes a location header pointing to the newly created resource.</remarks>
-        /// <param name="request">The request object containing the details of the article to create. Must not be null.</param>
-        /// <returns>A response that includes the URI of the newly created article and its details.</returns>
+        /// <param name="request">The request containing the details of the article to create. Must not be null.</param>
+        /// <returns>A response that, when successful, contains the details of the created article and a location header with the
+        /// URI of the new resource.</returns>
         [HttpPost]
-        public IActionResult Create([FromBody] CreateArticleRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateArticleRequest request)
         {
             int currentUserId = 1; // TODO: get from auth context
 
-            var articleDto = _articleService.Create(
+            var articleDto = await _articleService.Create(
                 request.Name,
                 request.Price,
                 currentUserId
@@ -87,11 +85,11 @@ namespace ShoppingCart.API.Controllers
         /// Retrieves all articles.
         /// </summary>
         /// <returns>An <see cref="IActionResult"/> containing a collection of articles. The response has a status code of 200
-        /// (OK) and includes a list of article data in the response body.</returns>
+        /// (OK) and includes a list of <see cref="ArticleResponse"/> objects representing all available articles.</returns>
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var articleDtos = _articleService.GetAll();
+            var articleDtos = await _articleService.GetAll();
             var response = articleDtos.Select(articleDto => new ArticleResponse
             (
                 articleDto.Id,
@@ -101,34 +99,33 @@ namespace ShoppingCart.API.Controllers
             return Ok(response);
         }
 
+
         /// <summary>
         /// Deletes the article with the specified identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the article to delete.</param>
-        /// <returns>An HTTP 204 No Content response if the article was successfully deleted.</returns>
+        /// <returns>A response indicating the result of the delete operation. Returns a 204 No Content status if the deletion is
+        /// successful.</returns>
         [HttpDelete("{id:int}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             int currentUserdId = 1; // TODO: get from auth context
-            _articleService.Delete(id, currentUserdId);
+            await _articleService.Delete(id, currentUserdId);
             return NoContent();
         }
 
         /// <summary>
         /// Updates the specified article with new values provided in the request body.
         /// </summary>
-        /// <remarks>This action uses the HTTP PATCH method to partially update an existing article. The
-        /// article must exist; otherwise, an error response is returned. The user performing the update is determined
-        /// from the authentication context.</remarks>
         /// <param name="id">The unique identifier of the article to update.</param>
         /// <param name="request">An object containing the updated article values. Cannot be null.</param>
         /// <returns>An <see cref="IActionResult"/> that represents the result of the update operation. Returns a response
         /// containing the updated article data if successful.</returns>
         [HttpPatch("{id:int}")]
-        public IActionResult Update(int id, [FromBody] UpdateArticleRequest request)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateArticleRequest request)
         {
             var currentUserdId = 1; // TODO: get from auth context
-            var article = _articleService.Update(
+            var article = await _articleService.Update(
                 id,
                 request.Name,
                 request.Price,

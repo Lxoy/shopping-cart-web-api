@@ -4,9 +4,9 @@ namespace ShoppingCart.Services.Interfaces
 {
     public interface ICartService
     {
-        public void AddItem(int userId, int articleId, int quantity);
-        public CartDto GetByUserId(int userId);
-        public void RemoveItem(int userId, int articleId);
-        public void RemoveAllItems(int userId);
+        Task AddItem(int userId, int articleId, int quantity);
+        Task<CartDto> GetByUserId(int userId);
+        Task RemoveItem(int userId, int articleId);
+        Task RemoveAllItems(int userId);
     }
 }

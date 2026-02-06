@@ -15,7 +15,7 @@ namespace ShoppingCart.Services.Services
             _dbContext = dbContext;
         }
 
-        public ArticleDto Create(string name, decimal price, int createdByUserId)
+        public async Task<ArticleDto> Create(string name, decimal price, int createdByUserId)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -37,8 +37,8 @@ namespace ShoppingCart.Services.Services
                 ModifiedAt = DateTime.UtcNow
             };
 
-            _dbContext.Articles.Add(article);
-            _dbContext.SaveChanges();
+            await  _dbContext.Articles.AddAsync(article);
+            await _dbContext.SaveChangesAsync();
             
             return new ArticleDto(
                 article.Id,
@@ -47,9 +47,9 @@ namespace ShoppingCart.Services.Services
                 );
         }
 
-        public void Delete(int id, int deletedByUserId)
+        public async Task Delete(int id, int deletedByUserId)
         {
-            var article = _dbContext.Articles.FirstOrDefault(a => a.Id == id);
+            var article = await _dbContext.Articles.FirstOrDefaultAsync(a => a.Id == id);
 
             if (article == null)
             {
@@ -60,12 +60,12 @@ namespace ShoppingCart.Services.Services
             article.ModifiedAt = DateTime.UtcNow;
             article.ModifiedByUserId = deletedByUserId;
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public IEnumerable<ArticleDto> GetAll()
+        public async Task<IEnumerable<ArticleDto>> GetAll()
         {
-            return _dbContext.Articles
+            return await _dbContext.Articles
                 .AsNoTracking()
                 .Where(a => !a.IsDeleted)
                 .Select(a => new ArticleDto(
@@ -73,14 +73,14 @@ namespace ShoppingCart.Services.Services
                     a.Name,
                     a.Price
                 ))
-                .ToList();
+                .ToListAsync();
         }
 
-        public ArticleDto GetById(int id)
+        public async Task<ArticleDto> GetById(int id)
         {
-            var article = _dbContext.Articles
+            var article = await _dbContext.Articles
                 .AsNoTracking()
-                .FirstOrDefault(a => a.Id == id && !a.IsDeleted) 
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted) 
                 ?? throw new KeyNotFoundException($"Article with id {id} not found.");
 
             return new ArticleDto(
@@ -90,13 +90,8 @@ namespace ShoppingCart.Services.Services
                 );
         }
 
-        public ArticleDto Update(int id, string? name, decimal? price, int modifiedByUserId)
+        public async Task<ArticleDto> Update(int id, string? name, decimal? price, int modifiedByUserId)
         {
-            if (name is null && price is null )
-            {
-                throw new ArgumentException("At least one field (name or price) must be provided for update.");
-            }
-
             if (name is not null && string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentException("Article name cannot be empty.");
@@ -107,7 +102,7 @@ namespace ShoppingCart.Services.Services
                 throw new ArgumentException("Price must be at least 0.1.");
             }
 
-            var article = _dbContext.Articles.FirstOrDefault(a => a.Id == id && !a.IsDeleted) ?? throw new KeyNotFoundException($"Article with id {id} not found.");
+            var article = await _dbContext.Articles.FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted) ?? throw new KeyNotFoundException($"Article with id {id} not found.");
 
             if(name is not null)
             {
@@ -122,7 +117,7 @@ namespace ShoppingCart.Services.Services
             article.ModifiedAt = DateTime.UtcNow;
             article.ModifiedByUserId = modifiedByUserId;
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return new ArticleDto(article.Id, article.Name, article.Price);
         }
