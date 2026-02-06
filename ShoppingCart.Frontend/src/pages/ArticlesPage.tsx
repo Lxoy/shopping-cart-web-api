@@ -55,10 +55,7 @@ export default function ArticlesPage() {
 
   const handleConfirmAdd = async (articleId: number, quantity: number) => {
     try {
-      await addToCart(userId, {
-        articleId,
-        quantity
-      });
+      await addToCart(userId, articleId);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

@@ -21,17 +21,16 @@ export const clearCart = async (userId: number): Promise<void> => {
     }
 };
 
-export const addToCart = async (userId: number, data: { articleId: number, quantity: number }): Promise<void> => {
-    const res = await fetch(`${API_URL}/cart/${userId}/items`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+export const addToCart = async (userId: number, articleId: number,): Promise<void> => {
+    const res = await fetch(`${API_URL}/cart/${userId}/items/${articleId}`, {
+        method: "POST"
     });
 
      if (!res.ok) throw new Error("Failed to add item to the cart");
 }
 
-export const removeItem = async (userId: number, articleId: number): Promise<void> => {
-    const res = await fetch(`${API_URL}/cart/${userId}/items/${articleId}`, {
+export const removeItem = async (userId: number, cartItemId: number): Promise<void> => {
+    const res = await fetch(`${API_URL}/cart/${userId}/items/${cartItemId}`, {
         method: "DELETE"
     });
 

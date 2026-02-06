@@ -13,7 +13,7 @@ namespace ShoppingCart.Data.Configurations
         {
             builder.ToTable("cart_items");
 
-            builder.HasKey(ci => new { ci.CartId, ci.ArticleId });
+            builder.HasKey(ci => ci.Id);
 
             builder.Property(ci => ci.Quantity)
                    .IsRequired();
@@ -25,6 +25,9 @@ namespace ShoppingCart.Data.Configurations
             builder.HasOne(ci => ci.Article)
                 .WithMany(a => a.CartItems)
                 .HasForeignKey(ci => ci.ArticleId);
+
+            builder.HasIndex(ci => new { ci.CartId, ci.ArticleId })
+               .IsUnique();
         }
     }
 }

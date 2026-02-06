@@ -2,11 +2,8 @@
 using ShoppingCart.Data;
 using ShoppingCart.Data.Models;
 using ShoppingCart.Services.Dtos;
+using ShoppingCart.Services.Exceptions;
 using ShoppingCart.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace ShoppingCart.Services.Services
 {
     public class CartService : ICartService
@@ -19,42 +16,6 @@ namespace ShoppingCart.Services.Services
             _dbContext = dbContext;
         }
 
-        public async Task AddItem(int userId, int articleId, int quantity)
-        {
-            if (!await _dbContext.Articles.AnyAsync(a => a.Id == articleId && !a.IsDeleted))
-            {
-                throw new KeyNotFoundException($"Article with id {articleId} not found.");
-            }
-
-            if (quantity <= 0 || quantity > MaxQuantity)
-                throw new ArgumentException($"Quantity must be between 1 and {MaxQuantity}.");
-
-            var cart = await GetOrCreateCart(userId);
-
-            var item = cart.CartItems.FirstOrDefault(ci => ci.ArticleId == articleId);
-
-            if (item == null)
-            {
-                cart.CartItems.Add(new CartItem
-                {
-                    ArticleId = articleId,
-                    Quantity = quantity
-                });
-            }
-            else
-            {
-                var newQuantity = item.Quantity + quantity;
-
-                if (newQuantity > MaxQuantity)
-                    throw new ArgumentException($"Maximum quantity per item is {MaxQuantity}.");
-
-                item.Quantity = newQuantity;
-            }
-
-            cart.ModifiedAt = DateTime.UtcNow;
-            await _dbContext.SaveChangesAsync();
-        }
-
         public async Task<CartDto> GetByUserId(int userId)
         {
             var cart = await GetOrCreateCart(userId);
@@ -64,6 +25,7 @@ namespace ShoppingCart.Services.Services
                 var total = ci.Quantity * ci.Article.Price;
 
                 return new CartItemDto(
+                    ci.Id,
                     ci.ArticleId,
                     ci.Article.Name,
                     ci.Article.Price,
@@ -78,36 +40,73 @@ namespace ShoppingCart.Services.Services
 
         }
 
-        public async Task DecreaseItemQuantity(int userId, int articleId)
+        public async Task AddItem(int userId, int articleId)
+        {
+            if (!await _dbContext.Articles.AnyAsync(a => a.Id == articleId && !a.IsDeleted))
+                throw new KeyNotFoundException($"Article with id {articleId} not found.");
+
+            var cart = await GetOrCreateCart(userId);
+            ValidateCartArticles(cart);
+
+            var item = cart.CartItems.FirstOrDefault(ci => ci.ArticleId == articleId);
+
+            if (item is null)
+            {
+                var newItem = new CartItem
+                {
+                    CartId = cart.Id,
+                    ArticleId = articleId,
+                    Quantity = 1
+                };
+
+                cart.CartItems.Add(newItem);
+                cart.ModifiedAt = DateTime.UtcNow;
+                await _dbContext.SaveChangesAsync();
+            }
+
+            else
+            {
+                throw new ArgumentException($"Item with id {articleId} is already in the cart.");
+            }
+        }
+
+        public async Task UpdateItemQuantity(int userId, int cartItemId, int quantity)
         {
             var cart = await GetOrCreateCart(userId);
+            
+            var item = cart.CartItems.FirstOrDefault(ci => ci.Id == cartItemId);
 
-            var item = cart.CartItems
-                .FirstOrDefault(ci => ci.ArticleId == articleId)
-                ?? throw new KeyNotFoundException($"Item with id {articleId} not found.");
+            if (item == null)
+                throw new KeyNotFoundException($"Item with id {cartItemId} not found.");
 
-            if (item.Quantity <= 1)
-                throw new InvalidOperationException("Quantity cannot be less than 1.");
+            if (!item.Article.IsDeleted)
+                ValidateCartArticles(cart);
 
-            item.Quantity -= 1;
+            if (quantity > MaxQuantity)
+                throw new ArgumentException($"Maximum quantity per item is {MaxQuantity}.");
 
-            if (item.Quantity <= 0)
+            if (quantity <= 0)
             {
                 _dbContext.CartItems.Remove(item);
             }
+            else
+            {
+                item.Quantity = quantity;
+            }
 
             cart.ModifiedAt = DateTime.UtcNow;
-
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task RemoveItem(int userId, int articleId)
+        public async Task RemoveItem(int userId, int cartItemId)
         {
             var cart = await GetOrCreateCart(userId);
 
-            var item = cart.CartItems
-                .FirstOrDefault(ci => ci.ArticleId == articleId)
-                ?? throw new KeyNotFoundException($"Item with id {articleId} not found.");
+            var item = cart.CartItems.FirstOrDefault(ci => ci.Id == cartItemId);
+
+            if (item == null)
+                throw new KeyNotFoundException($"Item with id {cartItemId} not found.");
+
 
             _dbContext.CartItems.Remove(item);
             cart.ModifiedAt = DateTime.UtcNow;
@@ -139,6 +138,19 @@ namespace ShoppingCart.Services.Services
             }
 
             return cart;
+        }
+
+        private static void ValidateCartArticles(Cart cart)
+        {
+            var invalidArticleIds = cart.CartItems
+                .Where(ci => ci.Article.IsDeleted)
+                .Select(ci => ci.ArticleId)
+                .ToList();
+
+            if (invalidArticleIds.Any())
+            {
+                throw new InvalidCartArticlesException(invalidArticleIds);
+            }
         }
     }
 }

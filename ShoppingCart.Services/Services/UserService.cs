@@ -18,7 +18,7 @@ namespace ShoppingCart.Services.Services
 
             if (user == null)
             {
-                throw new Exception($"User with id {id} not found");
+                throw new KeyNotFoundException($"User with id {id} not found");
             }
 
             return new UserDto (user.Id, user.Username );

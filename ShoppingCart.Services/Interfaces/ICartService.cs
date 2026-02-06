@@ -4,9 +4,10 @@ namespace ShoppingCart.Services.Interfaces
 {
     public interface ICartService
     {
-        Task AddItem(int userId, int articleId, int quantity);
         Task<CartDto> GetByUserId(int userId);
-        Task RemoveItem(int userId, int articleId);
+        Task AddItem(int userId, int articleId);
+        Task UpdateItemQuantity(int userId, int cartItemId, int quantity);
+        Task RemoveItem(int userId, int cartItemId);
         Task RemoveAllItems(int userId);
     }
 }

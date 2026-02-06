@@ -2,10 +2,9 @@
 
 namespace ShoppingCart.API.ViewModels.Requests
 {
-    public record AddCartItemRequest
+    public record ChangeCartItemQuantityRequest
     {
         [Required]
-        [Range(1, int.MaxValue)]
-        public int ArticleId { get; init; }
+        public int Quantity { get; init; }
     }
 }

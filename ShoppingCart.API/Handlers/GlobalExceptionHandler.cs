@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
+using ShoppingCart.Services.Exceptions;
 
 namespace ShoppingCart.API.Handlers
 {
@@ -19,6 +20,7 @@ namespace ShoppingCart.API.Handlers
 
             var statusCode = exception switch
             {
+                InvalidCartArticlesException => StatusCodes.Status409Conflict,
                 KeyNotFoundException => StatusCodes.Status404NotFound,
                 ArgumentException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
@@ -27,9 +29,22 @@ namespace ShoppingCart.API.Handlers
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = statusCode;
 
+            if (exception is InvalidCartArticlesException invalidCartEx)
+            {
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    errorCode = "INVALID_CART_ITEMS",
+                    message = invalidCartEx.Message,
+                    invalidArticleIds = invalidCartEx.ArticleIds,
+                    status = statusCode
+                });
+
+                return;
+            }
+
             await context.Response.WriteAsJsonAsync(new
             {
-                error = exception?.Message,
+                message = exception?.Message,
                 status = statusCode
             });
         }
