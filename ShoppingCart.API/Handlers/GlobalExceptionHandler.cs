@@ -35,7 +35,7 @@ namespace ShoppingCart.API.Handlers
                 {
                     errorCode = "INVALID_CART_ITEMS",
                     message = invalidCartEx.Message,
-                    invalidArticleIds = invalidCartEx.ArticleIds,
+                    invalidCartItemIds = invalidCartEx.ArticleIds,
                     status = statusCode
                 });
 

@@ -1,9 +1,13 @@
 import { API_URL } from "./config";
 import type { Article } from "../types/Article";
+import type { ApiError } from "../types/ApiError";
 
 export const getArticles = async (): Promise<Article[]> => {
     const res = await fetch(`${API_URL}/article`);
-    if (!res.ok) throw new Error("Failed to fetch articles");
+    if (!res.ok) {
+        const errorData: ApiError = await res.json();
+        throw errorData;
+    }
     return res.json();
 }
 
@@ -17,7 +21,10 @@ export const createArticle = async (data: {
         body: JSON.stringify(data)
     });
 
-    if (!res.ok) throw new Error("Failed to create article");
+    if (!res.ok) {
+        const errorData: ApiError = await res.json();
+        throw errorData;
+    }
 };
 
 export const deleteArticle = async (id: number) => {
@@ -25,5 +32,8 @@ export const deleteArticle = async (id: number) => {
         method: "DELETE"
     });
 
-    if (!res.ok) throw new Error("Failed to delete article");
+    if (!res.ok) {
+        const errorData: ApiError = await res.json();
+        throw errorData;
+    }
 };

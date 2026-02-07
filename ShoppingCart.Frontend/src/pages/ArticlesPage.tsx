@@ -5,25 +5,30 @@ import "./ArticlesPage.css";
 import ArticleForm from "../components/ArticleForm";
 import ArticleList from "../components/ArticleList";
 import { addToCart } from "../api/cartApi";
-import AddMenu from "../components/AddMenu";
-
+import CustomAlert from "../components/global/CustomAlert";
+import { useCartContext } from "../context/CartContext";
+import { Link } from "react-router-dom";
 export default function ArticlesPage() {
-  const [error, setError] = useState<string | null>(null);
-  const [articles, setArticles] = useState<Article[]>([]);
+  const { invalidItems, setInvalidItems } = useCartContext();
+
   const [loading, setLoading] = useState(true);
-  const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
-  const [quantity, setQuantity] = useState(1);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const [articles, setArticles] = useState<Article[]>([]);
   const userId = 1;
 
   const loadArticles = async () => {
     try {
       const data = await getArticles();
       setArticles(data);
-    } catch (err) {
-      if (err instanceof Error) {
+    } catch (err: any) {
+      if (err.errorCode === "INVALID_CART_ITEMS") {
+        setInvalidItems(err.invalidCartItemIds ?? []);
         setError(err.message);
-      } else {
-        setError("Unknown error occurred");
+      }
+      else {
+        setError(err.message || "Unknown error occurred");
       }
     }
     finally {
@@ -38,32 +43,34 @@ export default function ArticlesPage() {
   const handleDelete = async (id: number) => {
     try {
       await deleteArticle(id);
+      setSuccess("Article deleted successfully.");
       setArticles(prev => prev.filter(a => a.id !== id));
-    } catch (err) {
-      if (err instanceof Error) {
+    } catch (err: any) {
+      if (err.errorCode === "INVALID_CART_ITEMS") {
+        setInvalidItems(err.invalidCartItemIds ?? []);
         setError(err.message);
-      } else {
-        setError("Unknown error occurred");
       }
-    };
+      else {
+        setError(err.message || "Unknown error occurred");
+      }
+    }
   }
 
-  const openAddMenu = (id: number) => {
-    setSelectedArticleId(id);
-    setQuantity(1);
-  };
-
-  const handleConfirmAdd = async (articleId: number, quantity: number) => {
+  const handleAdd = async (articleId: number) => {
     try {
       await addToCart(userId, articleId);
-    } catch (err) {
-      if (err instanceof Error) {
+      setSuccess("Item added to cart successfully.");
+    } catch (err: any) {
+      if (err.errorCode === "INVALID_CART_ITEMS") {
+        console.log(err);
+        setInvalidItems(err.invalidCartItemIds ?? []);
+        console.log(invalidItems);
         setError(err.message);
-      } else {
-        setError("Unknown error occurred");
       }
-    };
-
+      else {
+        setError(err.message || "Unknown error occurred");
+      }
+    }
   };
 
   if (loading) {
@@ -74,31 +81,23 @@ export default function ArticlesPage() {
     );
   }
 
-
-  if (error) {
-    return (
-      <div className="error-box">
-        <p className="message">{error}</p>
-      </div>
-    );
-  }
-  
   return (
     <div className="article-page">
-      <a href="/cart" className="cart-nav">Cart</a>
-      {selectedArticleId !== null &&
-        <div className="add-menu">
-          <AddMenu
-            selectedArticleId={selectedArticleId}
-            quantity={quantity}
-            setQuantity={setQuantity}
-            onConfirm={handleConfirmAdd}
-            onClose={() => {
-              setSelectedArticleId(null);
-              setQuantity(1);
-            }}
-          />
-        </div>}
+      {error && (
+        <CustomAlert
+          message={error}
+          type="error"
+          onClose={() => setError(null)}
+        />
+      )}
+      {success && (
+        <CustomAlert
+          message={success}
+          type="success"
+          onClose={() => setSuccess(null)}
+        />
+      )}
+      <Link to="/cart" className="cart-nav">Cart</Link>
       <div className="article-form">
         <div>
           <h2 style={{ textAlign: "center", marginBottom: "16px", color: "#fff" }}>
@@ -112,7 +111,7 @@ export default function ArticlesPage() {
       <div className="article-list-wrapper">
         <ArticleList
           articles={articles}
-          onAdd={openAddMenu}
+          onAdd={handleAdd}
           onDelete={handleDelete}
         />
       </div>

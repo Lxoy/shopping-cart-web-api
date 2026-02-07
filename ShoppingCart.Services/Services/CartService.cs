@@ -73,7 +73,7 @@ namespace ShoppingCart.Services.Services
         public async Task UpdateItemQuantity(int userId, int cartItemId, int quantity)
         {
             var cart = await GetOrCreateCart(userId);
-            
+
             var item = cart.CartItems.FirstOrDefault(ci => ci.Id == cartItemId);
 
             if (item == null)
@@ -142,14 +142,14 @@ namespace ShoppingCart.Services.Services
 
         private static void ValidateCartArticles(Cart cart)
         {
-            var invalidArticleIds = cart.CartItems
-                .Where(ci => ci.Article.IsDeleted)
-                .Select(ci => ci.ArticleId)
-                .ToList();
+            var invalidCartItemIds = cart.CartItems
+                 .Where(ci => ci.Article.IsDeleted)
+                 .Select(ci => ci.Id)
+                 .ToList();
 
-            if (invalidArticleIds.Any())
+            if (invalidCartItemIds.Any())
             {
-                throw new InvalidCartArticlesException(invalidArticleIds);
+                throw new InvalidCartArticlesException(invalidCartItemIds);
             }
         }
     }

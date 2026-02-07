@@ -1,25 +1,27 @@
 import { useEffect, useState } from "react"
-import { clearCart, getCart, removeItem } from "../api/cartApi";
+import { changeItemQuantity, clearCart, getCart, removeItem } from "../api/cartApi";
 import type { Cart } from "../types/Cart";
 import './CartPage.css';
-import CartItemList from "../components/CartItemsList";
+import CartItemList from "../components/article-page/CartItemsList";
+import CustomAlert from "../components/global/CustomAlert";
+import { useCartContext } from "../context/CartContext";
+import { Link } from "react-router-dom";
 
 export default function CartPage() {
-    const [error, setError] = useState<string | null>(null);
-    const [cart, setCart] = useState<Cart>();
+    const { invalidItems, setInvalidItems } = useCartContext();
+
     const [loading, setLoading] = useState(true);
+    const [success, setSuccess] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const [cart, setCart] = useState<Cart>();
     const userId = 1;
+    console.log("invalidItems:", invalidItems);
 
     const loadCart = async () => {
         try {
             const data = await getCart(userId);
             setCart(data);
-        } catch (err) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError("Unknown error occurred");
-            }
         }
         finally {
             setLoading(false);
@@ -29,21 +31,53 @@ export default function CartPage() {
     const handleClearCart = async () => {
         try {
             await clearCart(userId);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Unknown error occurred");
-        } finally {
+            setInvalidItems([]);
+            setSuccess("Cart cleared successfully.");
+        } catch (err: any) {
+            if (err.errorCode === "INVALID_CART_ITEMS") {
+                setInvalidItems(err.invalidCartItemIds ?? []);
+                setError(err.message);
+            }
+            else {
+                setError(err.message || "Unknown error occurred");
+            }
+        }
+        finally {
             loadCart();
         }
     };
 
+    const handleItemQuantityChange = async (itemCartId: number, quantity: number) => {
+        try {
+            await changeItemQuantity(userId, itemCartId, quantity);
+            setInvalidItems([]);
+            setSuccess("Quantity updated.");
+        }
+        catch (err: any) {
+            if (err.errorCode === "INVALID_CART_ITEMS") {
+                setInvalidItems(err.invalidCartItemIds ?? []);
+                setError(err.message);
+            }
+            else {
+                setError(err.message || "Unknown error occurred");
+            }
+        } finally {
+            loadCart();
+        }
+    }
+
     const handleItemDelete = async (articleId: number) => {
         try {
             await removeItem(userId, articleId);
-        } catch (err) {
-            if (err instanceof Error) {
+            setInvalidItems([]);
+            setSuccess("Item removed from cart.");
+        } catch (err: any) {
+            if (err.errorCode === "INVALID_CART_ITEMS") {
+                setInvalidItems(err.invalidCartItemIds ?? []);
                 setError(err.message);
-            } else {
-                setError("Unknown error occurred");
+            }
+            else {
+                setError(err.message || "Unknown error occurred");
             }
         }
         finally {
@@ -64,19 +98,24 @@ export default function CartPage() {
         );
     }
 
-
-    if (error) {
-        return (
-            <div className="error-box">
-                <p className="message">{error}</p>
-            </div>
-        );
-    }
-
     if (cart!) {
         return (
             <div className="cart-page">
-                <a href="/articles" className="article-nav">Articles</a>
+                {error && (
+                    <CustomAlert
+                        message={error}
+                        type="error"
+                        onClose={() => setError(null)}
+                    />
+                )}
+                {success && (
+                    <CustomAlert
+                        message={success}
+                        type="success"
+                        onClose={() => setSuccess(null)}
+                    />
+                )}
+                <Link to="/articles" className="article-nav">Articles</Link>
 
                 <div className="cart-container">
                     <h2 className="cart-title">Your Cart</h2>
@@ -84,6 +123,8 @@ export default function CartPage() {
                     <div className="cart-list">
                         <CartItemList
                             cartItems={cart.items}
+                            invalidItems={invalidItems}
+                            onChange={handleItemQuantityChange}
                             onDelete={handleItemDelete}
                         />
                     </div>

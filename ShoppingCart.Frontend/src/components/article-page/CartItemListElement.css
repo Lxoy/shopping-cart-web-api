@@ -70,3 +70,29 @@
 .delete-button:active {
   transform: scale(0.95);
 }
+
+.cart-item.invalid {
+  background-color: #2a1616;
+  border-left: 4px solid #ef4444;
+}
+
+.cart-item.invalid .article-name {
+  color: #ffb3b3;
+}
+
+.cart-item.invalid .article-price,
+.cart-item.invalid span {
+  color: #d1a1a1;
+}
+
+.cart-item.invalid .add-button,
+.cart-item.invalid .delete-button:first-child {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.invalid-message {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 4px;
+}

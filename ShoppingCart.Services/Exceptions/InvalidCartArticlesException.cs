@@ -9,7 +9,7 @@ namespace ShoppingCart.Services.Exceptions
         public IReadOnlyCollection<int> ArticleIds { get; }
 
         public InvalidCartArticlesException(IEnumerable<int> articleIds)
-        : base("Some articles in the cart are no longer available.")
+        : base("Some items in your cart are no longer available. Please remove them to continue.")
         {
             ArticleIds = articleIds.ToList().AsReadOnly();
         }
