@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createArticle } from "../api/articleApi";
+import { createArticle } from "../../api/articleApi";
 import './ArticleForm.css'
 
 export default function ArticleForm({
@@ -41,6 +41,7 @@ export default function ArticleForm({
         type="number"
         step="0.01"
         min={0.1}
+        max={99999}
         value={price}
         onChange={e => setPrice(e.target.value)}
       />

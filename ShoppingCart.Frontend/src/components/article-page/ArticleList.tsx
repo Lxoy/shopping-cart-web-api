@@ -1,4 +1,4 @@
-import type { Article } from "../types/Article";
+import type { Article } from "../../types/Article";
 import ArticleItem from "./ArticleItem";
 import './ArticleList.css'
 

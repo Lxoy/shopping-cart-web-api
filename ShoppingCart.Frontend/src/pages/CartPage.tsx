@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { changeItemQuantity, clearCart, getCart, removeItem } from "../api/cartApi";
 import type { Cart } from "../types/Cart";
 import './CartPage.css';
-import CartItemList from "../components/article-page/CartItemsList";
+import CartItemList from "../components/cart-page/CartItemsList";
 import CustomAlert from "../components/global/CustomAlert";
 import { useCartContext } from "../context/CartContext";
 import { Link } from "react-router-dom";
